@@ -42,8 +42,4 @@ public class FileWorker {
             e.printStackTrace();
         }
     }
-
-    public static void main(String[] args) {
-        new FileWorker();
-    }
 }
