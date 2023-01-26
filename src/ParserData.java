@@ -1,23 +1,23 @@
-import java.util.ArrayList;
-
 public class ParserData {
     public static String parseKIZ(String string) {
-        StringBuilder builder = new StringBuilder();
-        // печатает тип упаковки, первичка 01
-        builder.append(string.substring(0, 2));
-        builder.append(" ");
-        // печатаем GTIN
-        builder.append(string.substring(2, 16));
-        builder.append(" ");
-        // печатаем серийный номер
-        builder.append(string.substring(18, 31));
-        builder.append(" ");
-        // печатаем ключ проверки
-        builder.append(string.substring(33, 37));
-        builder.append(" ");
-        // печатаем криптохвост
-        builder.append(string.substring(39));
-        builder.append(" ");
-        return builder.toString();
+        // печатает тип упаковки 2 символа
+        return string.substring(0, 2) +
+                " " +
+                // печатаем GTIN 14 символов
+                string.substring(2, 16) +
+                " " +
+                // печатаем серийный номер 13 символов
+                string.substring(18, 31) +
+                " " +
+                // печатаем ключ проверки 4 символа
+                string.substring(33, 37) +
+                " " +
+                // печатаем криптохвост 44 символа
+                string.substring(39) +
+                " ";
+    }
+    public static String ejectSgtin(String string) {
+        return string.substring(2, 16) +
+                string.substring(18, 31);
     }
 }

@@ -5,16 +5,22 @@ import java.util.Scanner;
 public class FileWorker {
     private final String fileInput;
     private final String fileOutput;
-    private final Scanner scanner = new Scanner(System.in);
     private final ArrayList<String> arrayKiz = new ArrayList<>();
 
     public FileWorker() {
         System.out.println("ВВедите файл источник кизов");
+        Scanner scanner = new Scanner(System.in);
         fileInput = scanner.nextLine();
         System.out.println("ВВедите файл разобранных кизов");
         fileOutput = scanner.nextLine();
         loadFile(fileInput);
         saveFile(fileOutput);
+    }
+    public FileWorker(String inputFile, String outputFile) {
+        this.fileInput = inputFile;
+        this.fileOutput = outputFile;
+        loadFile(inputFile);
+        saveFile(outputFile);
     }
 
 
