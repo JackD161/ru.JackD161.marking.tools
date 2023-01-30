@@ -7,6 +7,9 @@ public class FileWorker {
         loadFile(inputFile);
         saveFile(outputFile);
     }
+    public FileWorker(String inputFile) {
+        loadFile(inputFile);
+    }
     private void loadFile(String fileName) {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             while(reader.ready()) {
@@ -29,5 +32,9 @@ public class FileWorker {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<String> getArrayKiz() {
+        return arrayKiz;
     }
 }

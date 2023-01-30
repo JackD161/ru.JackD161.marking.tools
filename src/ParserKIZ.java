@@ -1,10 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.util.ArrayList;
 
 public class ParserKIZ {
     public static void main(String[] args) {
         JFrame window = new JFrame("Конвертер КИЗ в SGTIN");
-        window.setBounds(200, 300, 380, 400);
+        window.setBounds(200, 300, 730, 550);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
         JLabel sourceFile = new JLabel("Файл источник");
@@ -15,10 +18,16 @@ public class ParserKIZ {
         JTextField outputFile = new JTextField(30);
         JTextField scanField = new JTextField(30);
         JTextField sgtin = new JTextField(30);
+        JTextArea outputField = new JTextArea(25, 30);
+        JScrollPane scrollPane = new JScrollPane(outputField);
         JButton reset = new JButton("Сброс");
         reset.setBackground(Color.RED);
         JButton confirm = new JButton("Конвертация");
         JButton ejectSgtin = new JButton("Извлечь SGTIN");
+        JButton clipboard = new JButton("В буффер");
+        JCheckBox fromFile = new JCheckBox("Из файла");
+        fromFile.setBackground(Color.ORANGE);
+        clipboard.setBackground(Color.MAGENTA);
         ejectSgtin.setBackground(Color.ORANGE);
         confirm.setBackground(Color.GREEN);
         window.setVisible(true);
@@ -35,6 +44,7 @@ public class ParserKIZ {
         bar.add(help);
         JPanel footer = new JPanel();
         JPanel center = new JPanel();
+        JPanel right = new JPanel();
         center.add(sourceFile);
         center.add(inputFile);
         center.add(destinationFile);
@@ -43,13 +53,17 @@ public class ParserKIZ {
         center.add(scanField);
         center.add(sgtinLabel);
         center.add(sgtin);
+        right.add(scrollPane);
         footer.add(confirm);
         footer.add(reset);
         footer.add(ejectSgtin);
+        footer.add(fromFile);
+        footer.add(clipboard);
         footer.setLayout(new FlowLayout());
         window.getContentPane().add(BorderLayout.NORTH, bar);
         window.getContentPane().add(BorderLayout.SOUTH, footer);
         window.getContentPane().add(BorderLayout.CENTER, center);
+        window.getContentPane().add(BorderLayout.EAST, right);
         window.setVisible(true);
         reset.addActionListener(e -> {
             inputFile.setText("");
@@ -59,6 +73,8 @@ public class ParserKIZ {
             inputFile.setBackground(Color.WHITE);
             outputFile.setBackground(Color.WHITE);
             scanField.setBackground(Color.WHITE);
+            outputField.setText("");
+            fromFile.setSelected(false);
         });
         aboutIt.addActionListener(e -> JOptionPane.showMessageDialog(window, "Версия конвертора 1.0 alpha"));
         exit.addActionListener(e -> System.exit(0));
@@ -66,10 +82,9 @@ public class ParserKIZ {
         confirm.addActionListener(e -> {
             boolean outFileNotEmpty;
             boolean originFileNotEmpty;
-            String originFile;
-            String outFile;
-            originFile = inputFile.getText();
-            outFile = outputFile.getText();
+            String originFile= inputFile.getText();
+            String outFile = outputFile.getText();
+
             if (originFile.isEmpty()) {
                 inputFile.setBackground(Color.PINK);
                 originFileNotEmpty = false;
@@ -90,19 +105,47 @@ public class ParserKIZ {
         });
         ejectSgtin.addActionListener(e -> {
             boolean scanFieldNotEmpty;
+            boolean originFileNotEmpty;
+            String originFile= inputFile.getText();
+            boolean fromFileCheckBox = fromFile.isSelected();
             String inputScanField;
-            inputScanField = scanField.getText();
-            if (inputScanField.isEmpty()) {
-                scanField.setBackground(Color.PINK);
-                scanFieldNotEmpty = false;
+            if (fromFileCheckBox) {
+                if (originFile.isEmpty()) {
+                    inputFile.setBackground(Color.PINK);
+                    originFileNotEmpty = false;
+                }
+                else {
+                    originFileNotEmpty = true;
+                    outputFile.setBackground(Color.WHITE);
+                }
+                if (originFileNotEmpty) {
+                    ArrayList<String> kizs = new FileWorker(originFile).getArrayKiz();
+                    outputField.removeAll();
+                    for (String kiz : kizs) {
+                        outputField.append(ParserData.ejectSgtin(kiz));
+                        outputField.append("\n");
+                    }
+                }
             }
             else {
-                scanFieldNotEmpty = true;
-                scanField.setBackground(Color.WHITE);
+                inputScanField = scanField.getText();
+                if (inputScanField.isEmpty()) {
+                    scanField.setBackground(Color.PINK);
+                    scanFieldNotEmpty = false;
+                } else {
+                    scanFieldNotEmpty = true;
+                    scanField.setBackground(Color.WHITE);
+                }
+                if (scanFieldNotEmpty) {
+                    sgtin.setText(ParserData.ejectSgtin(inputScanField));
+                }
             }
-            if (scanFieldNotEmpty) {
-                sgtin.setText(ParserData.ejectSgtin(inputScanField));
-            }
+        });
+        clipboard.addActionListener(e -> {
+            String inputScanField = outputField.getText();
+            StringSelection stringSelection = new StringSelection(inputScanField);
+            Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            systemClipboard.setContents(stringSelection, null);
         });
     }
 }
